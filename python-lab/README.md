@@ -31,7 +31,6 @@ Skapa en version av det klassiska spelet Hangman.
    * Börja gissa bokstäver tills du gissar hela ordet eller förlorar spelet.
 
 ## Licens
-Detta projekt är licensierat under MIT License. Se [LICENSE](LICENSE) för mer information.
 
 ## Kontakt
 * Namn: Elias Johansson
