@@ -16,7 +16,7 @@ Skapa en version av det klassiska spelet Hangman.
 
 ### Steg
 1. **Klonar repo:**  
-   git clone https://github.com/eljoh-97/ITHS-AI-Pythonprogrammering-HT24.git  
+   git clone https://github.com/eljoh-97/ITHS-AI-Pythonprogrammering-HT24/tree/master/python-lab
 2. **Installera eventuella beroenden:**  
    pip install colored
 
