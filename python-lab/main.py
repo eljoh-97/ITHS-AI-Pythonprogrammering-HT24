@@ -1,9 +1,18 @@
 import random
 from output_list import random_words
+import colored
+from colored import stylize
+
+green = colored.fg(2) # green
+blue =  colored.fg(4) # blue
+red =  colored.fg(9) # light red
+yellow = colored.fg(3) # yellow
+magenta = colored.fg(5) # magenta
+cyan = colored.fg(6) # cyan               
 
 class Hangman:
     
-    def __init__(self, use_random_words=True):
+    def __init__(self, use_random_words=True, max_guesses=15):
         
         # Only used for testing purpose when use_random_words is set to False
         testing_words = ["fanta", "sprite", "cola", "pepsi"]
@@ -16,6 +25,7 @@ class Hangman:
         self.display = ['_' for letter in self.word]
         self.guesses = 0
         self.guessed_letters = set()
+        self.max_guesses = max_guesses
     
     def __str__(self):
         display = ' '.join(self.display)
@@ -24,7 +34,7 @@ class Hangman:
     def get_word(self, guess):
         # Check, if the letter exist or not
         if guess in self.guessed_letters:
-            print(f"Du har redan gissat på följande bokstav: '{guess}'!")
+            print(stylize(f"Du har redan gissat på följande bokstav: '{guess}'!", magenta))
             
         # Else, proceed and add it to the guess list
         guess_list = []
@@ -33,7 +43,6 @@ class Hangman:
                 guess_list.append(index)
         
         self.guessed_letters.add(guess)
-        
         return guess_list
     
     def update(self, idx, letter):
@@ -47,39 +56,56 @@ class Hangman:
             idx = self.get_word(guess)
             self.update(idx, guess)
         else:
-            print(f"Bokstanven '{guess}' finns inte i ordet.")
+            print(stylize(f"Bokstaven '{guess}' finns inte i ordet.\n", yellow))
 
-
-    def check_win(self):
-        # Check if all letters have been guessed
-        if self.display == list(self.word):
-            print("\nVinst!!!")
+    def check_loss(self):
+        # If the user has guessed more than max_guesses
+        if self.guesses >= self.max_guesses:
+            print(stylize(f"\nTyvärr så har du gissat {self.guesses} gånger vilket är mycket! Ordet vi sökte var: {self.word}\n", red))
             return True
         return False
+
+    def check_win(self):
+        # Check if all letters have been guessed and inside the max_guesses range
+        if self.display == list(self.word):
+            print(stylize(f"\nGrattis du har gissat rätt!!, rätt ord var: {self.word}!", green))
+            return True
+        return False
+    
+    def number_of_guess_left(self):
+        # Display the number of guess left, until the user has reached the correct word
+        guess_left = self.max_guesses - self.guesses
+        if guess_left != 0:
+            print(stylize(f"Du har {guess_left} gissningar kvar\n", cyan))
+        elif guess_left == 0:
+            return guess_left
         
 def main():
     print("Programmet startar...\n")
-    use_random_words = False  # Set to False to use testing words list
-    word = Hangman(use_random_words)
+    use_random_words = True  # Set to False to use testing words list
+    word = Hangman(use_random_words, max_guesses=15)
     print("Välkommen till Hänga Gubbe!")
     name = None
-    try:
+    try: # Prevent the program from crashing by error handler: 'KeyboardInterrupt'
+        
+        # 1st while loop will run until a valid value has been inputted
         while name is None:
-            try:
+            try: # Prevent the program from crashing by error handler: 'KeyboardInterrupt'
                 name = input("Vad är ditt namn?\n").capitalize()
             except KeyboardInterrupt:
                 print("\nVänligen, försök igen att ange ditt namn")
                 continue
+        # 2nd while loop will run until check if the user are aware of the rules of the program, will run until a valid value has been inputted
         while True:
-            try:
+            try: # Prevent the program from crashing by error handler: 'KeyboardInterrupt' + 'ValueError'
                 identify_the_user = input(f"\n{name} kan du spelets regler? (Ja / Nej): \n").lower()
-                if identify_the_user == "ja":
+                if identify_the_user == "ja": # In case of 'Yes', the while loop ends and continue the program
                     print("\nHärligt! Låt spelet börja.")
                     break
-                elif identify_the_user == 'nej':
-                    print("\n----------------------------------------------------------------------------------------------------------------------------------------------------")
-                    print("""Okej! Här kommer en kort beskrivning kring spelets regler:\nHänga gubbe är orgniellt en penna- och papperslek för en eller flera deltagare. Men här kommer vi istället använda oss av en dator.\nSpelet går ut på att gissa bokstäver i ett ord vars bokstäver initialt är helt dolda, men som visas som ledtrådar när spelaren lyckats gissa på dem.""")
-                    print("----------------------------------------------------------------------------------------------------------------------------------------------------")
+                elif identify_the_user == 'nej': # In case of 'No', we print out a short description and the while loop ends and continue the program
+                    print(stylize("\n----------------------------------------------------------------------------------------------------------------------------------------------------", blue))
+                    print(stylize("""Okej! Här kommer en kort beskrivning kring spelets regler:\nHänga gubbe är orgniellt en penna- och papperslek för en eller flera deltagare. Men här kommer vi istället använda oss av en dator.\nSpelet går ut på att gissa bokstäver i ett ord vars bokstäver initialt är helt dolda, men som visas som ledtrådar när spelaren lyckats gissa på dem.""", blue))
+                    print(stylize("----------------------------------------------------------------------------------------------------------------------------------------------------", blue))
                     break
                 else:
                     print("Du har angett ett felaktigt värde, vänligen ange 'Ja' eller 'Nej.")
@@ -89,20 +115,23 @@ def main():
             except ValueError:
                 print("\nFelaktig inmatning. Vänligen ange 'Ja' eller 'Nej och försök igen.")
                 continue
-
+        # 3rd while loop will run until the program is done, displaying win, losses & remaining guesses 
         while True:
-            try:
-                guess = input(f"\n{name} vänligen gissa en bokstav: ").lower()
+            try: # Prevent the program from crashing by error handler: 'KeyboardInterrupt' + 'ValueError'
+                guess = input(f"\n{name} vänligen gissa en bokstav: ").lower() # Check if the inputted value is str and an alphabetic string, if not print out a message
                 if len(guess) != 1 or not guess.isalpha():
                     print("Ange endast en enda bokstav\n")
                     continue
-                word.check_guess(guess)
+                word.check_guess(guess) # Check if the letter is already guessed
                 print(word)
-                word.guesses += 1
-                if word.check_win():
-                    print(f"{name}, det tog dig {word.guesses} gissningar!")
+                word.guesses += 1 # Track incorrect guesses
+                word.number_of_guess_left() # Number of guesses left
+                if word.check_loss(): # In case of loss
                     break
-            except KeyboardInterrupt:
+                if word.check_win(): # In case of win
+                    print(stylize(f"{name}, det tog dig {word.guesses} gissningar!\n", green))
+                    break
+            except KeyboardInterrupt: # Prevent the program from crashing  - in case of typing e.g CTRL+C 
                 print("\nFelaktig inmatning. Vänligen ange en bokstav och försök igen.")
                 continue
             except ValueError:
