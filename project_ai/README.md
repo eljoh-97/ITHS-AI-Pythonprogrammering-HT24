@@ -9,7 +9,7 @@ Grund idé
 
 ### Steg
 1. **Klonar repo:**  
-    git clone 
+    git clone: https://github.com/eljoh-97/ITHS-AI-Pythonprogrammering-HT24/tree/master/project_ai
 2. **Installera eventuella beroenden:**  
     pip install pandas
     pip install numpy
